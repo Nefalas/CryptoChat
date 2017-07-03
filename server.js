@@ -8,7 +8,7 @@ app.use(express.static(__dirname + '/client'));
 users = [];
 connections = [];
 
-server.listen(3000);
+server.listen(80);
 console.log('Server running');
 
 app.get('/', serve);
