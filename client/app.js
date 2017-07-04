@@ -1,5 +1,6 @@
+var socket = io.connect();
+
 $(function() {
-  var socket = io.connect();
 
   var $userFormArea = $('#userFormArea');
   var $messageArea = $('#messageArea');
@@ -7,6 +8,7 @@ $(function() {
 
   var $userForm = $('#userForm');
   var $username = $('#username');
+  var $password = $('#password');
   var $key = $('#key');
 
   var $messageForm = $('#messageForm');
@@ -19,13 +21,13 @@ $(function() {
 
   $userForm.submit(function(e) {
     e.preventDefault();
-    if ($username.val() && $key.val()) {
+    if ($username.val() && $key.val() && $password.val()) {
+      socket.emit('protected username', {
+        username: $username.val(),
+        password: $password.val()
+      });
+    } else if ($username.val() && $key.val()) {
       socket.emit('new user', $username.val());
-      key = $key.val();
-      $username.val('');
-      $key.val('');
-      $userFormArea.hide();
-      $messageArea.show();
     }
   });
 
@@ -48,7 +50,7 @@ $(function() {
     var decrypted;
     try {
       decrypted = CryptoJS.AES.decrypt(data.message, key).toString(CryptoJS.enc.Utf8);
-    } catch(err) {
+    } catch (err) {
       decrypted = data.message;
     }
     if (!decrypted) {
@@ -64,7 +66,19 @@ $(function() {
       html += '<li class="list-group-item">' + data[i] + '</li>'
     }
     $users.html(html);
-  })
+  });
+
+  socket.on('login accepted', function(data) {
+    key = $key.val();
+    $username.val('');
+    $key.val('');
+    $userFormArea.hide();
+    $messageArea.show();
+  });
+
+  socket.on('ask password', function(data) {
+    $('#password-input').show();
+  });
 });
 
 function swapStyleSheet(sheet) {
@@ -82,4 +96,29 @@ function loadStyleSheet() {
   if (localStorage.getItem("CryptoChatStyleSheet")) {
     swapStyleSheet(localStorage.getItem("CryptoChatStyleSheet"));
   }
+}
+
+function toggleFullScreen() {
+  if ((document.fullScreenElement && document.fullScreenElement !== null) ||
+    (!document.mozFullScreen && !document.webkitIsFullScreen)) {
+    if (document.documentElement.requestFullScreen) {
+      document.documentElement.requestFullScreen();
+    } else if (document.documentElement.mozRequestFullScreen) {
+      document.documentElement.mozRequestFullScreen();
+    } else if (document.documentElement.webkitRequestFullScreen) {
+      document.documentElement.webkitRequestFullScreen(Element.ALLOW_KEYBOARD_INPUT);
+    }
+  } else {
+    if (document.cancelFullScreen) {
+      document.cancelFullScreen();
+    } else if (document.mozCancelFullScreen) {
+      document.mozCancelFullScreen();
+    } else if (document.webkitCancelFullScreen) {
+      document.webkitCancelFullScreen();
+    }
+  }
+}
+
+function addUser() {
+  socket.emit('add user');
 }

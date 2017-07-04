@@ -2,11 +2,14 @@ var express = require('express');
 var app = express();
 var server = require('http').createServer(app);
 var io = require('socket.io').listen(server);
+var fs = require('fs');
+
+var Whitelist = require('./whitelist.js');
+var wl = new Whitelist;
 
 app.use(express.static(__dirname + '/client'));
 
 users = [];
-whiteList = [];
 
 server.listen(80);
 console.log('Server running');
@@ -41,10 +44,28 @@ function handleConnection(socket) {
 
   // New user
   socket.on('new user', function(data) {
-    socket.username = data;
-    users.push(socket.username);
-    updateUsernames();
-  })
+    if (wl.hasUsername(data)) {
+      socket.emit('ask password');
+    } else {
+      socket.emit('login accepted');
+      socket.username = data;
+      users.push(socket.username);
+      updateUsernames();
+    }
+  });
+
+  socket.on('protected username', function(data) {
+    if (wl.match(data.username, data.password)) {
+      socket.emit('login accepted');
+      socket.username = data.username;
+      users.push(socket.username);
+      updateUsernames();
+    }
+  });
+
+  socket.on('add user', function(data) {
+    wl.addUser('böa', 'böa');
+  });
 
   function updateUsernames() {
     io.sockets.emit('get users', users);

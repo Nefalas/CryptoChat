@@ -4,3 +4,29 @@
   -moz-user-select: none; /* Firefox */
   -ms-user-select: none; /* IE10+ */
 }
+
+.navbar-default {
+  margin-bottom: 100px;
+}
+
+#password-input {
+  display: none;
+}
+
+#password-input p {
+  color: red;
+}
+
+#messageArea {
+  display: none;
+}
+
+#btnSend {
+  margin-right: 20px;
+}
+
+@media (max-width: 978px) {
+  .navbar-default {
+    margin-bottom: 20px;
+  }
+}

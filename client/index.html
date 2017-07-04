@@ -33,8 +33,20 @@
           <li class="dropdown">
             <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">Appearance <span class="caret"></span></a>
             <ul class="dropdown-menu">
-              <li><a onclick="swapStyleSheet('default.css')">Default</a></li>
-              <li><a onclick="swapStyleSheet('console.css')">Console</a></li>
+              <li><a role="button" onclick="swapStyleSheet('default.css')">Default</a></li>
+              <li><a role="button" onclick="swapStyleSheet('console.css')">Console</a></li>
+            </ul>
+          </li>
+          <li class="dropdown">
+            <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">Options <span class="caret"></span></a>
+            <ul class="dropdown-menu">
+              <li><a role="button" onclick="toggleFullScreen()">Fullscreen</a></li>
+            </ul>
+          </li>
+          <li class="dropdown">
+            <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">Admin <span class="caret"></span></a>
+            <ul class="dropdown-menu">
+              <li><a role="button" onclick="addUser()">Add user</a></li>
             </ul>
           </li>
         </ul>
@@ -54,6 +66,14 @@
             <label>Enter decryption key</label>
             <input class="form-control" id="key" />
             <br />
+            <div id="password-input">
+              <p>
+                This username is password protected, please enter your password
+              </p>
+              <label>Enter password</label>
+              <input class="form-control" id="password" />
+              <br />
+            </div>
             <input type="submit" class="btn" value="Login" />
           </div>
         </form>
