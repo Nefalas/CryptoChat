@@ -3,19 +3,49 @@
 
 <head>
   <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>CryptoChat</title>
   <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
-  <link rel="stylesheet" type="text/css" href="/style.css">
+  <link rel="stylesheet" type="text/css" href="/styles/common.css">
+  <link id="stylesheet" rel="stylesheet" type="text/css" href="/styles/default.css">
   <script src="https://code.jquery.com/jquery-latest.min.js"></script>
   <script src="/socket.io/socket.io.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/3.1.2/rollups/aes.js"></script>
+  <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js" integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa" crossorigin="anonymous"></script>
   <script src="/app.js"></script>
 </head>
 
 <body>
+
+  <nav class="navbar navbar-default">
+    <div class="container-fluid">
+      <div class="navbar-header">
+        <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#main-navbar-collapse" aria-expanded="false">
+          <span class="sr-only">Toggle navigation</span>
+          <span class="icon-bar"></span>
+          <span class="icon-bar"></span>
+          <span class="icon-bar"></span>
+        </button>
+        <a class="navbar-brand" href="#">CryptoChat</a>
+      </div>
+      <div class="collapse navbar-collapse" id="main-navbar-collapse">
+        <ul class="nav navbar-nav">
+          <li class="dropdown">
+            <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">Appearance <span class="caret"></span></a>
+            <ul class="dropdown-menu">
+              <li><a onclick="swapStyleSheet('default.css')">Default</a></li>
+              <li><a onclick="swapStyleSheet('console.css')">Console</a></li>
+            </ul>
+          </li>
+        </ul>
+      </div>
+    </div>
+  </nav>
+
   <div class="container">
+
     <div class=row id="userFormArea">
-      <div class="col-md-4">
+      <div class="col-md-4 col-md-offset-4">
         <form id="userForm">
           <div class="form-group">
             <label>Enter username</label>
@@ -24,11 +54,12 @@
             <label>Enter decryption key</label>
             <input class="form-control" id="key" />
             <br />
-            <input type="submit" class="btn btn-primary" value="Login" />
+            <input type="submit" class="btn" value="Login" />
           </div>
         </form>
       </div>
     </div>
+
     <div class="row" id="messageArea">
       <div class="col-md-4">
         <div class="well">
@@ -41,14 +72,19 @@
         <form id="messageForm">
           <div class="form-group">
             <label>Enter message</label>
-            <textarea class="form-control" id="message"></textarea>
+            <textarea class="form-control" rows="5" id="message"></textarea>
             <br />
-            <input type="submit" class="btn btn-primary" value="Send message" />
+            <input type="submit" class="btn" id="btnSend" value="Send message" />
+            <label class="checkbox-inline">
+              <input type="checkbox"> Save message
+            </label>
           </div>
         </form>
       </div>
     </div>
+
   </div>
+
 </body>
 
 </html>

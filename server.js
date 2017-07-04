@@ -6,7 +6,7 @@ var io = require('socket.io').listen(server);
 app.use(express.static(__dirname + '/client'));
 
 users = [];
-connections = [];
+whiteList = [];
 
 server.listen(80);
 console.log('Server running');
@@ -20,7 +20,6 @@ function serve(req, res) {
 };
 
 function handleConnection(socket) {
-  connections.push(socket);
   console.log('User %s connected', socket.id);
 
   // Disconnection

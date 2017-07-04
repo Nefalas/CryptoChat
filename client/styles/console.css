@@ -1,0 +1,101 @@
+*,
+*:active,
+*:focus {
+  font-family: 'Courier New', Courier, monospace;
+  color: white !important;
+  background: black !important;
+}
+
+body {
+  background: black;
+}
+
+h3 {
+  margin: 0 0 20px 0;
+}
+
+.navbar-default {
+  margin-bottom: 100px;
+}
+
+.form-control {
+  color: white;
+  border-radius: 0;
+  background: black;
+}
+
+.form-control:focus,
+.form-control:active {
+  border-color: #cccccc;
+  -webkit-box-shadow: none;
+  box-shadow: none;
+}
+
+.btn,
+.btn:focus {
+  background: black;
+  color: white;
+  border-radius: 0;
+  border-color: white;
+  outline: none;
+}
+
+.btn:hover {
+  background: white;
+  color: black;
+}
+
+.btn:active {
+  font-weight: 800;
+  outline: none !important;
+}
+
+.well {
+  color: white;
+  background: black;
+  border-color: white;
+  border-radius: 0;
+}
+
+.list-group {
+  border-radius: 0;
+}
+
+.list-group-item {
+  color: white;
+  background: black;
+  border-radius: 0 !important;
+}
+
+.navbar {
+  border-width: 0 0 1px 0 !important;
+}
+
+.navbar *,
+.navbar:active *,
+.navbar:focus * {
+  color: white !important;
+  background: black;
+}
+
+.navbar ul.dropdown-menu {
+  border: 1px solid white;
+}
+
+.navbar a:hover {
+  font-weight: 800;
+}
+
+#messageArea {
+  display: none;
+}
+
+#btnSend {
+  margin-right: 20px;
+}
+
+@media (max-width: 978px) {
+  .navbar-default {
+    margin-bottom: 20px;
+  }
+}

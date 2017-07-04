@@ -15,6 +15,8 @@ $(function() {
 
   var key;
 
+  loadStyleSheet();
+
   $userForm.submit(function(e) {
     e.preventDefault();
     if ($username.val() && $key.val()) {
@@ -64,3 +66,20 @@ $(function() {
     $users.html(html);
   })
 });
+
+function swapStyleSheet(sheet) {
+  $('#stylesheet').attr('href', '/styles/' + sheet);
+  saveStyleSheet(sheet);
+}
+
+function saveStyleSheet(sheet) {
+  if (typeof(Storage !== "undefined")) {
+    localStorage.setItem("CryptoChatStyleSheet", sheet);
+  }
+}
+
+function loadStyleSheet() {
+  if (localStorage.getItem("CryptoChatStyleSheet")) {
+    swapStyleSheet(localStorage.getItem("CryptoChatStyleSheet"));
+  }
+}
