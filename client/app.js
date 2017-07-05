@@ -4,12 +4,17 @@ $(function() {
 
   var $userFormArea = $('#userFormArea');
   var $messageArea = $('#messageArea');
+  var $newUserArea = $('#newUserArea');
   var $users = $('#users');
 
   var $userForm = $('#userForm');
   var $username = $('#username');
   var $password = $('#password');
   var $key = $('#key');
+
+  var $newUserForm = $('#newUserForm');
+  var $newUsername = $('#newUsername');
+  var $newPassword = $('#newPassword');
 
   var $messageForm = $('#messageForm');
   var $message = $('#message');
@@ -46,6 +51,29 @@ $(function() {
     }
   }
 
+  $newUserForm.submit((e) => {
+    e.preventDefault();
+    if ($newUsername.val() && $newPassword.val()) {
+      socket.emit('add user', {
+        username: $newUsername.val(),
+        password: $newPassword.val()
+      });
+    }
+  });
+
+  socket.on('invalid username', (data) => {
+    $('#newUsernameError').show();
+    $('#newUsernameGroup').addClass('has-error');
+  });
+
+  socket.on('user added', (data) =>{
+    $('#newUsernameError').hide();
+    $('#newUsernameGroup').removeClass('has-error');
+    $newUsername.val('');
+    $newPassword.val('');
+    showOnly($messageArea);
+  });
+
   socket.on('new message', function(data) {
     var decrypted;
     try {
@@ -56,7 +84,7 @@ $(function() {
     if (!decrypted) {
       decrypted = data.message;
     }
-    $chat.append('<div class="well"><strong>' + data.username +
+    $chat.append('<div><strong>' + data.username +
       '</strong>: ' + decrypted + '</div>');
   });
 
@@ -72,13 +100,28 @@ $(function() {
     key = $key.val();
     $username.val('');
     $key.val('');
-    $userFormArea.hide();
-    $messageArea.show();
+    showOnly($messageArea);
   });
 
   socket.on('ask password', function(data) {
     $('#password-input').show();
   });
+
+  $('#toggleNewUser').click(() => {
+    showOnly($newUserArea);
+  });
+
+  $('#cancelNewUser').click((e) => {
+    e.preventDefault();
+    showOnly($messageArea);
+  });
+
+  function showOnly(element) {
+    $userFormArea.hide();
+    $messageArea.hide();
+    $newUserArea.hide();
+    element.show();
+  }
 });
 
 function swapStyleSheet(sheet) {
@@ -117,8 +160,4 @@ function toggleFullScreen() {
       document.webkitCancelFullScreen();
     }
   }
-}
-
-function addUser() {
-  socket.emit('add user');
 }

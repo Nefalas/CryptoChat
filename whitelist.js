@@ -1,20 +1,21 @@
 var fs = require('fs');
 
+var path = __dirname + '/storage/whitelist';
+var encoding = 'utf8';
+
 Whitelist = function() {
   this.whitelist = {};
   this.fillList();
 }
 
 Whitelist.prototype.fillList = function() {
-  fs.readFile(__dirname + '/storage/whitelist', 'utf8', (err, data) => {
-    if (err) throw err;
-    this.whitelist = JSON.parse(data);
-  });
+  this.whitelist = JSON.parse(fs.readFileSync(path, encoding));
 }
 
 Whitelist.prototype.hasUsername = function(username) {
+  this.fillList();
   for (var i = 0; i < this.whitelist.length; i++) {
-    if (this.whitelist[i].username == username) {
+    if (this.whitelist[i].username.toLowerCase() == username.toLowerCase()) {
       return true;
     }
   }
@@ -22,8 +23,9 @@ Whitelist.prototype.hasUsername = function(username) {
 }
 
 Whitelist.prototype.match = function(username, password) {
+  this.fillList();
   for (var i = 0; i < this.whitelist.length; i++) {
-    if (this.whitelist[i].username == username) {
+    if (this.whitelist[i].username.toLowerCase() == username.toLowerCase()) {
       if (this.whitelist[i].password == password) {
         return true;
       } else {
@@ -35,8 +37,17 @@ Whitelist.prototype.match = function(username, password) {
 }
 
 Whitelist.prototype.addUser = function(username, password) {
-  var currentWhitelist = fs.readFileSync(__dirname + '/storage/whitelist', 'utf8');
-  console.log(currentWhitelist);
+  var newWhitelist = JSON.parse(fs.readFileSync(path, encoding));
+  newWhitelist.push({
+    "username": username,
+    "password": password
+  });
+  this.whitelist = newWhitelist;
+  fs.writeFile(path, JSON.stringify(this.whitelist), encoding, (err) => {
+    if (err) {
+      console.log('Could not save whitelist: ' + err);
+    }
+  });
 }
 
 module.exports = Whitelist;

@@ -64,7 +64,12 @@ function handleConnection(socket) {
   });
 
   socket.on('add user', function(data) {
-    wl.addUser('böa', 'böa');
+    if (wl.hasUsername(data.username)) {
+      socket.emit('invalid username');
+    } else {
+      wl.addUser(data.username, data.password);
+      socket.emit('user added');
+    }
   });
 
   function updateUsernames() {
