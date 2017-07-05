@@ -3,28 +3,29 @@ var socket = io.connect();
 $(function() {
 
   var $userFormArea = $('#userFormArea');
-  var $messageArea = $('#messageArea');
-  var $newUserArea = $('#newUserArea');
-  var $users = $('#users');
+  var $messageArea  = $('#messageArea');
+  var $newUserArea  = $('#newUserArea');
+  var $users        = $('#users');
 
-  var $userForm = $('#userForm');
-  var $username = $('#username');
-  var $password = $('#password');
-  var $key = $('#key');
+  var $userForm     = $('#userForm');
+  var $username     = $('#username');
+  var $password     = $('#password');
+  var $key          = $('#key');
 
-  var $newUserForm = $('#newUserForm');
-  var $newUsername = $('#newUsername');
-  var $newPassword = $('#newPassword');
+  var $newUserForm  = $('#newUserForm');
+  var $newEmail     = $('#email');
 
-  var $messageForm = $('#messageForm');
-  var $message = $('#message');
-  var $chat = $('#chat');
+  var $messageForm  = $('#messageForm');
+  var $message      = $('#message');
+  var $chat         = $('#chat');
+
+  var $adminControl = $('#adminControl');
 
   var key;
 
   loadStyleSheet();
 
-  $userForm.submit(function(e) {
+  $userForm.submit((e) => {
     e.preventDefault();
     if ($username.val() && $key.val() && $password.val()) {
       socket.emit('protected username', {
@@ -36,7 +37,7 @@ $(function() {
     }
   });
 
-  $messageForm.submit(handleSubmit).keydown(function(e) {
+  $messageForm.submit(handleSubmit).keydown((e) => {
     if (e.keyCode == 13) {
       handleSubmit(e);
     }
@@ -53,11 +54,9 @@ $(function() {
 
   $newUserForm.submit((e) => {
     e.preventDefault();
-    if ($newUsername.val() && $newPassword.val()) {
-      socket.emit('add user', {
-        username: $newUsername.val(),
-        password: $newPassword.val()
-      });
+    if ($newEmail.val()) {
+      socket.emit('send invitation', $newEmail.val());
+      showOnly($messageArea);
     }
   });
 
@@ -74,7 +73,7 @@ $(function() {
     showOnly($messageArea);
   });
 
-  socket.on('new message', function(data) {
+  socket.on('new message', (data) => {
     var decrypted;
     try {
       decrypted = CryptoJS.AES.decrypt(data.message, key).toString(CryptoJS.enc.Utf8);
@@ -88,7 +87,7 @@ $(function() {
       '</strong>: ' + decrypted + '</div>');
   });
 
-  socket.on('get users', function(data) {
+  socket.on('get users', (data) => {
     var html = '';
     for (i = 0; i < data.length; i++) {
       html += '<li class="list-group-item">' + data[i] + '</li>'
@@ -96,14 +95,18 @@ $(function() {
     $users.html(html);
   });
 
-  socket.on('login accepted', function(data) {
+  socket.on('login accepted', (data) => {
     key = $key.val();
     $username.val('');
     $key.val('');
     showOnly($messageArea);
   });
 
-  socket.on('ask password', function(data) {
+  socket.on('admin granted', (data) => {
+    $adminControl.show();
+  });
+
+  socket.on('ask password', (data) => {
     $('#password-input').show();
   });
 

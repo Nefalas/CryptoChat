@@ -1,6 +1,6 @@
 var fs = require('fs');
 
-var path = __dirname + '/storage/whitelist';
+var path = __dirname + '/server/storage/whitelist';
 var encoding = 'utf8';
 
 Whitelist = function() {

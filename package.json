@@ -9,7 +9,10 @@
   "author": "Nefalas",
   "license": "ISC",
   "dependencies": {
-    "socket.io": "*",
-    "express": "*"
+    "body-parser": "^1.17.2",
+    "express": "*",
+    "jsonwebtoken": "^7.4.1",
+    "nodemailer": "^4.0.1",
+    "socket.io": "*"
   }
 }
