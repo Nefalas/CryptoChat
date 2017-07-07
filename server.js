@@ -105,11 +105,7 @@ function handleConnection(socket) {
       from: 'cryptochat.auto@gmail.com',
       to: data,
       subject: 'Invitation to CryptoChat',
-      html: '<h1>You have been invited to CryptoChat</h1>' +
-        '<p>Please follow this link:</p>' +
-        '<a href="http://cryptochat.serveftp.com/secure-api/new-user?token=' + token + '">' +
-        'http://localhost/secure-api/new-user?token=' + token + '</a>' +
-        '<p>This link will expire in one hour</p>'
+      text: 'http://cryptochat.serveftp.com/secure-api/new-user?token=' + token
     }
 
     mailer.sendMail(mailOptions, (err, info) => {
