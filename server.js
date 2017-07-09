@@ -10,9 +10,6 @@ var Whitelist = require('./whitelist.js');
 
 var secureRoute = express.Router();
 
-// Controllers
-var userController = require('./server/controllers/user-controller.js');
-
 var wl = new Whitelist;
 var mailer = nodemailer.createTransport({
   service: 'gmail',
@@ -47,11 +44,9 @@ secureRoute.use((req, res, next) => {
   }
 });
 
-app.get('/test', userController.test);
 secureRoute.get('/new-user', (req, res) => {
   res.sendFile(__dirname + '/client/add-user.html');
 })
-secureRoute.post('/add-user', userController.addUser);
 
 app.get('/', (req, res) => {
   res.sendFile(__dirname + '/client/index.html');
@@ -80,6 +75,17 @@ function handleConnection(socket) {
       message: data,
       username: socket.username
     });
+  });
+
+  app.post('/send-message', (req, res) => {
+    var message = req.body.message;
+    if (message) {
+      io.sockets.emit('new message', {
+        message: message,
+        username: 'api'
+      });
+      res.send("Message sent");
+    }
   });
 
   // New user
