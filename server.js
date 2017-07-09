@@ -9,6 +9,7 @@ var nodemailer = require('nodemailer');
 var Whitelist = require('./whitelist.js');
 
 var secureRoute = express.Router();
+var authRoute = express.Router();
 
 var wl = new Whitelist;
 var mailer = nodemailer.createTransport({
@@ -20,18 +21,20 @@ var mailer = nodemailer.createTransport({
 });
 
 var users = [];
+var userKeys = {};
 
 app.use(bodyParser.urlencoded({
   extended: true
 }));
 app.use(bodyParser.json());
 app.use('/secure-api', secureRoute);
+app.use('/auth', authRoute);
 app.use(express.static(__dirname + '/client'));
 
 process.env.SECRET_KEY = randomKey(32);
 
 secureRoute.use((req, res, next) => {
-  var token = req.body.token || req.headers['token'] || req.query.token;
+  var token = req.query.token;
   if (token) {
     jwt.verify(token, process.env.SECRET_KEY, (err, decode) => {
       if (err) {
@@ -44,9 +47,28 @@ secureRoute.use((req, res, next) => {
   }
 });
 
+authRoute.use((req, res, next) => {
+  var token = req.body.token;
+  var username = req.body.username;
+  if (token && username) {
+    jwt.verify(token, userKeys.username, (err, decode) => {
+      if (err) {
+        return res.status(500).send("Invalid token");
+      }
+      if (username.toLowerCase() == decode.username.toLowerCase()) {
+        next();
+      } else {
+        res.status(500).send("Invalid token");
+      }
+    });
+  } else {
+    res.status(500).send("Invalid request");
+  }
+});
+
 secureRoute.get('/new-user', (req, res) => {
   res.sendFile(__dirname + '/client/add-user.html');
-})
+});
 
 app.get('/', (req, res) => {
   res.sendFile(__dirname + '/client/index.html');
@@ -60,8 +82,59 @@ io.sockets.on('connection', handleConnection);
 function handleConnection(socket) {
   console.log('User %s connected', socket.id);
 
+  app.post('/login', (req, res) => {
+    var username = req.body.username;
+    var password = req.body.password;
+    if (username && password) {
+      if (wl.match(username, password)) {
+        userKeys.username = randomKey(32);
+        var token = jwt.sign({
+          username: username
+        }, userKeys.username);
+        res.send(token);
+        users.push(username);
+        updateUsernames();
+      } else {
+        res.status(500).send("Invalid password or username");
+      }
+    } else {
+      res.status(500).send("Invalid request");
+    }
+  });
+
+  app.post('/send-message', (req, res) => {
+    var message = req.body.message;
+    var username = req.body.username;
+    if (wl.hasUsername(username)) {
+      return res.status(500).send("Password protected username");
+    }
+    if (message && username) {
+      io.sockets.emit('new message', {
+        message: message,
+        username: username
+      });
+      res.send("Message sent");
+    } else {
+      res.status(500).send("Invalid request");
+    }
+  });
+
+  authRoute.post('/send-message', (req, res) => {
+    var message = req.body.message;
+    var username = req.body.username;
+    if (message && username) {
+      io.sockets.emit('new message', {
+        message: message,
+        username: username
+      });
+      res.send("Message sent");
+    } else {
+      res.status(500).send("Invalid request");
+    }
+  });
+
   // Disconnection
-  socket.on('disconnect', function(data) {
+  socket.on('disconnect', (data) => {
     if (!socket.username) return;
     users.splice(users.indexOf(socket.username), 1);
     updateUsernames();
@@ -69,7 +142,7 @@ function handleConnection(socket) {
   });
 
   // Send message
-  socket.on('send message', function(data) {
+  socket.on('send message', (data) => {
     console.log('New message: %s', data);
     io.sockets.emit('new message', {
       message: data,
@@ -77,19 +150,8 @@ function handleConnection(socket) {
     });
   });
 
-  app.post('/send-message', (req, res) => {
-    var message = req.body.message;
-    if (message) {
-      io.sockets.emit('new message', {
-        message: message,
-        username: 'api'
-      });
-      res.send("Message sent");
-    }
-  });
-
   // New user
-  socket.on('new user', function(data) {
+  socket.on('new user', (data) => {
     if (wl.hasUsername(data)) {
       socket.emit('ask password');
     } else {
@@ -123,7 +185,7 @@ function handleConnection(socket) {
     })
   });
 
-  socket.on('protected username', function(data) {
+  socket.on('protected username', (data) => {
     if (wl.match(data.username, data.password)) {
       socket.emit('login accepted');
       socket.emit('admin granted');
@@ -133,7 +195,7 @@ function handleConnection(socket) {
     }
   });
 
-  socket.on('add user', function(data) {
+  socket.on('add user', (data) => {
     if (wl.hasUsername(data.username)) {
       socket.emit('invalid username');
     } else {
